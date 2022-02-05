@@ -1,1 +1,1 @@
-# Demo.Kubernetes.Helm
+# Helm Chart
