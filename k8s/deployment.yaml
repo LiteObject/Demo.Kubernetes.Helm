@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-forecast-webapi-deployment
+  labels:
+    app: weather-forecast-webapi-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-forecast-webapi-pod
+  template:
+    metadata:
+      labels:
+        app: weather-forecast-webapi-pod
+    spec:
+      containers:
+        - name: weather-forecast-webapi-container          
+          image: liteobject/demo-helm-chart:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            #containerPort (optional) defined here describes the port exposed inside the container
+            - containerPort: 81
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+:81
+          resources:
+            limits:
+              memory: 128Mi # To limit memory at 256MB, you can assign 268.4M (SI notation) or 256Mi (Binary notation).
+              cpu: "0.5"
+---
+# The service will be �ClusterIP�. The service will not be exposed outside the cluster. 
+# The access will be granted by the Ingress controller.
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-forecast-webapi-service
+spec:
+  type: ClusterIP
+  ports:    
+    - port: 81
+      targetPort: 81
+      protocol: TCP
+  selector:
+    service: weather-forecast-webapi-pod
